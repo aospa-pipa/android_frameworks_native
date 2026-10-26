@@ -775,13 +775,15 @@ void OutputLayer::writeOutputDependentGeometryStateToHWC(HWC2::Layer* hwcLayer,
     }
 
     uint32_t z_udfps = z;
-    if ((strstr(getLayerFE().getDebugName(), UDFPS_LAYER_NAME) != nullptr) ||
-        (strstr(getLayerFE().getDebugName(), UDFPS_BIOMETRIC_PROMPT_LAYER_NAME) != nullptr)) {
-        z_udfps = getUdfpsZOrder(z, false);
-    } else if (strstr(getLayerFE().getDebugName(), UDFPS_DIM_LAYER_NAME) != nullptr) {
-        z_udfps = getUdfpsDimZOrder(z);
-    } else if (strstr(getLayerFE().getDebugName(), UDFPS_TOUCHED_LAYER_NAME) != nullptr) {
+    const char* layerName = getLayerFE().getDebugName();
+
+    if (strstr(layerName, UDFPS_TOUCHED_LAYER_NAME) != nullptr) {
         z_udfps = getUdfpsZOrder(z, true);
+    } else if ((strstr(layerName, UDFPS_LAYER_NAME) != nullptr) ||
+               (strstr(layerName, UDFPS_BIOMETRIC_PROMPT_LAYER_NAME) != nullptr)) {
+        z_udfps = getUdfpsZOrder(z, false);
+    } else if (strstr(layerName, UDFPS_DIM_LAYER_NAME) != nullptr) {
+        z_udfps = getUdfpsDimZOrder(z);
     }
 
     if (auto error = hwcLayer->setZOrder(z_udfps); error != hal::Error::NONE) {
